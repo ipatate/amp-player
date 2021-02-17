@@ -1,4 +1,5 @@
 <template>
+  <canvas ref="meter" width="500" height="50"></canvas>
   <audio ref="player">
     <source :src="sound" type="audio/wav" />
   </audio>
@@ -24,6 +25,9 @@
 
 <script>
 // https://gist.githubusercontent.com/lukewduncan/3e041e4b22a50855f9faaf01dec40137/raw/4565e193c2dbe6bfcbed7264d5a6a3f10991b9a2/audio-player.js
+
+import {drawLoop, initCanvaMeter} from './init-meter';
+
 const calculateTotalValue = length => {
   const minutes = Math.floor(length / 60);
   //   const seconds = +(length - minutes * 60)
@@ -46,6 +50,7 @@ const calculateCurrentValue = currentTime => {
 
   return current_time;
 };
+
 export default {
   name: 'Player',
   props: {
@@ -66,6 +71,8 @@ export default {
     this.$refs.player.addEventListener('play', this.onPlay);
     this.$refs.player.addEventListener('timeupdate', this.onProgress);
     this.currentTime = calculateCurrentValue(0);
+    // init meter volume
+    initCanvaMeter(this.$refs.meter, this.$refs.player);
   },
   computed: {
     sound: function() {
@@ -100,6 +107,7 @@ export default {
     },
     play: function() {
       if (this.$refs.player.paused) {
+        drawLoop();
         this.$refs.player.play();
       }
     },
